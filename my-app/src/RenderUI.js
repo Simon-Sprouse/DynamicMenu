@@ -3,8 +3,11 @@ import { useState } from 'react';
 import SliderComponent from './components/SliderComponent';
 import ButtonComponent from './components/ButtonComponent';
 import SelectComponent from './components/SelectComponent';
+import MenuButtonComponent from './components/MenuButtonComponent.js';
 
-function RenderUI({ parameters, schema, path, onChange }) { 
+import DynamicRangeComponent from './components/DynamicRangeComponent.js';
+
+function RenderUI({ parameters, schema, path, onChange, updateMenu }) { 
 
     // const getNestedValue = (obj, path) => path.reduce((o, key) => (o ? o[key] : undefined), obj);
 
@@ -16,9 +19,10 @@ function RenderUI({ parameters, schema, path, onChange }) {
         "slider": SliderComponent,
         "button": ButtonComponent,
         "select": SelectComponent,
+        "dynamicRange": DynamicRangeComponent, 
     }
 
-    const DefaultComponent = () => <div>Default Component</div>;
+    const DefaultComponent = ({ name }) => <div>Unknown Component: {name}</div>;
 
     function resolveComponent(componentName) { 
         if (componentMap[componentName]) { 
@@ -44,6 +48,17 @@ function RenderUI({ parameters, schema, path, onChange }) {
                         schema={value}
                         path={currentPath}
                         onChange={onChange}
+                        updateMenu={updateMenu}
+                    />
+                </div>
+            )
+        }
+        else if (typeof value == "object" && value.component == "menuButton") { 
+            return (
+                <div key={value}>
+                    <MenuButtonComponent 
+                        onChange={updateMenu}
+                        {...(value.props || {})}
                     />
                 </div>
             )
@@ -52,12 +67,16 @@ function RenderUI({ parameters, schema, path, onChange }) {
             const Component = resolveComponent(value.component);
             return (
                 <div key={index}>
-                    <p>{key}</p>
-                    <Component 
-                        value={currentValue}
-                        onChange={(newValue) => onChange(currentPath, newValue)}
-                        {...(value.props || {})}
-                    />
+                    <span>
+                        <p>{key}</p>
+                        <Component 
+                            value={currentValue}
+                            onChange={(newValue) => onChange(currentPath, newValue)}
+                            {...(value.props || {})}
+                            name={value.component}
+                        />
+                    </span>
+                    
                 </div>
             )
         }

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 
 
@@ -6,46 +6,92 @@ import RenderUI from './RenderUI';
 
 function Menu() { 
 
+    const [menuWindow, setMenuWindow] = useState("Color");
+
     const [parameters, setParameters] = useState({
         "Color": { 
+            "isStatic": true,
+            "Static": {"h":120, "s":90, "v":80},
             "Gradient": [
                 { "color" : {"h":120, "s":90, "v":80}, "position": 0 },
                 { "color" : {"h":180, "s":90, "v":80}, "position": 100 },
             ],
             "Shift": "loop",
+            "ShiftSpeed": 69,
         },
         "Shape": {
-            "ElementSize": 100,
-            "BorderSize": 0,
+            "ElementSize": {
+                "isStatic": true,
+                "Static": 100,
+                "Dynamic": [0, 100],
+                "ShiftType": "loop",
+                "ShiftSpeed": 42,
+            },
+            "BorderSize": {
+                "isStatic": true,
+                "Static": 10,
+                "Dynamic": [0, 10],
+                "ShiftType": "loop",
+                "ShiftSpeed": 42,
+            },
         }, 
         "Movement": {
             "Pattern": "randomWalk",
             "Speed": 42,
-            "Qux": 69,
+            "StepSize": 69,
         }
     });
+
+
+ 
 
     const schema = {
         
         "Color": { 
+            
+            "conditional": () => ["Color"].includes(menuWindow),
+
+            "isStatic": {
+                "component": "button",
+                "props": { "label": "isStatic"},
+            },
+            "Static": {
+                "component": "colorWheel",
+                "props": { "label": "Slish"},
+                "conditional": () => parameters.Color.isStatic == true,
+            },
+            "Edit Gradient": {
+                "component": "menuButton",
+                "props": { "label": "Edit Gradient", "result": "Gradient"},
+                "conditional": () => parameters.Color.isStatic == false,
+            },
             "Gradient": { 
                 "component": "gradientUI", 
-                "props": { "label": "Slish"} 
+                "props": { "label": "Slish"}, 
+                "conditional": () => parameters.Color.isStatic == false,
             },
             "Shift": { 
                 "component": "select", 
-                "props": { "options": ["loop", "bounce", "meander", "random"]}
-            }
+                "props": { "options": ["loop", "bounce", "meander", "random"]},
+                "conditional": () => parameters.Color.isStatic == false,
+            },
+            "ShiftSpeed": { 
+                "component": "slider", 
+                "props": { "min": 2, "max": 200},
+                "conditional": () => parameters.Color.isStatic == false && ["loop", "bounce", "meander"].includes(parameters.Color.Shift),
+            },
+            
         },
         "Shape": {
             "ElementSize": { 
-                "component": "slider", 
-                "props": { "min": 2, "max": 200} 
+                "component": "dynamicRange", 
+                "props": { "min": 0, "max": 200 },
             },
             "BorderSize":  { 
-                "component": "slider", 
-                "props": { "min": 2, "max": 200} 
+                "component": "dynamicRange", 
+                "props": { "min": 0, "max": 20} 
             },
+            "conditional": () => menuWindow == "Shape"
         },
         "Movement": {
             "Pattern" : { 
@@ -56,18 +102,12 @@ function Menu() {
                 "component": "slider", 
                 "props": { "min": 0, "max": 100}
             },
-            // I need a bat component if random
-            "Bat": { 
-                "component": "button", 
-                "props": { "label": "slish" }, 
-                "conditional": (parameters) => parameters.Movement.Pattern == "random"
-            },
-            // I need a qux component if randomWalk
-            "Qux": { 
+            "StepSize": { 
                 "component": "slider", 
                 "props": { "min": 0, "max": 100},
-                "conditional": (parameters) => parameters.Movement.Pattern == "randomWalk"
-            }
+                "conditional": () => parameters.Movement.Pattern == "randomWalk"
+            },
+            "conditional": () => menuWindow == "Movement"
         }
     };
 
@@ -80,9 +120,9 @@ function Menu() {
             // if conditional is present
             if (section.conditional) {
                 // add section without conditional if true
-                if (section.conditional(parameters)) { 
+                if (section.conditional()) { 
                     const { conditional, ...sectionWithoutConditional } = section;
-                    result[key] = sectionWithoutConditional;
+                    result[key] = handleDynamicSchema(sectionWithoutConditional, parameters);
                 }
             }
             else if (typeof section == "object" && !Array.isArray(section)) { 
@@ -125,8 +165,39 @@ function Menu() {
     }
 
 
+    function handleEscape() { 
+        if (menuWindow == "Color") { 
+            setMenuWindow("Shape");
+        }
+        else if (menuWindow == "Shape") { 
+            setMenuWindow("Movement");
+        }
+        else if (menuWindow == "Movement") { 
+            setMenuWindow("Color");
+        }
+        else { 
+            setMenuWindow("Color");
+        }
+
+    }
+
+
+    useEffect(() => { 
+        function handleKeyDown(event) { 
+            if (event.key == "Escape") { 
+                handleEscape();
+            }
+        }
+        document.addEventListener("keydown", handleKeyDown);
+        return () => { 
+            document.removeEventListener("keydown", handleKeyDown);
+        }
+    });
+
+
     return (
         <div>
+            <p>Menu Window: {menuWindow}</p>
             <span style={{display: "flex", justifyContent: "space-between"}}>
                 <div style={{flex: 1, paddingRight: '20px'}}>
                     <pre style={{"textAlign": "left"}}>Parameters: {JSON.stringify(parameters, null, 2)}</pre>
@@ -137,6 +208,7 @@ function Menu() {
                         schema={visibleSchema}
                         path={[]}
                         onChange={handleParameterChange}
+                        updateMenu={(menuOption) => setMenuWindow(menuOption)}
                     />
                 </div>
                 
