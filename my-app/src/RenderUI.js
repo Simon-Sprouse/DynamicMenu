@@ -2,6 +2,7 @@ import { useState } from 'react';
 
 import SliderComponent from './components/SliderComponent';
 import ButtonComponent from './components/ButtonComponent';
+import SelectComponent from './components/SelectComponent';
 
 function RenderUI({ parameters, schema, path, onChange }) { 
 
@@ -14,6 +15,7 @@ function RenderUI({ parameters, schema, path, onChange }) {
     const componentMap = {
         "slider": SliderComponent,
         "button": ButtonComponent,
+        "select": SelectComponent,
     }
 
     const DefaultComponent = () => <div>Default Component</div>;
@@ -54,7 +56,7 @@ function RenderUI({ parameters, schema, path, onChange }) {
                     <Component 
                         value={currentValue}
                         onChange={(newValue) => onChange(currentPath, newValue)}
-                        {...value.props}
+                        {...(value.props || {})}
                     />
                 </div>
             )

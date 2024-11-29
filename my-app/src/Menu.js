@@ -11,13 +11,14 @@ function Menu() {
             "BorderSize": 0,
         },
         "Color": { 
-            "IsStatic": false,
-            "Static": {"h":120, "s":90, "v":80},
             "Gradient": [
                 { "color" : {"h":120, "s":90, "v":80}, "position": 0 },
                 { "color" : {"h":180, "s":90, "v":80}, "position": 100 },
             ],
         },
+        "Movement": {
+            "Pattern": "randomWalk",
+        }
     });
 
     const schema = {
@@ -26,10 +27,12 @@ function Menu() {
             "BorderSize":  { "component": "slider", "props": { "min": 2, "max": 200} },
         },
         "Color": { 
-            "IsStatic":  { "component": "button", "props": { "label": "Slish"} },
-            "Static": { "component": "colorWheel", "props": { "label": "Slish"} },
             "Gradient": { "component": "gradientUI", "props": { "label": "Slish"} },
+            "Movement": { "component": "select", "props": { "options": ["loop", "bounce", "meander", "random"]}}
         },
+        "Movement": {
+            "Pattern" : { "component": "select", "props": { "options": ["random", "randomWalk"]} }
+        }
     };
 
    
@@ -73,6 +76,8 @@ function Menu() {
                 path={[]}
                 onChange={handleParameterChange}
             />
+            <p></p>
+            <p></p>
         </div>
     )
 }
