@@ -1,6 +1,12 @@
+import { useState } from 'react';
+
 import ColorWheel from "../colorFunctions/ColorWheel";
+import GradientUI from "../colorFunctions/GradientUI";
+import DisplayBar from '../colorFunctions/DisplayBar';
 
 function DynamicColorRangeComponent( {value, onChange } ) { 
+
+    const [inGradientUI, setInGradientUI] = useState(false);
 
     function handleUpdate(key, newValue) { 
         const updatedState = { ...value, [key]: newValue };
@@ -38,14 +44,29 @@ function DynamicColorRangeComponent( {value, onChange } ) {
                 </div>
             )}
 
-            
             {!value.isStatic && (
                 <div>
-                    handle Dynamic Range
+                    <button onClick={() => setInGradientUI(!inGradientUI)}>
+                        {inGradientUI ? "Close" : "Open"} Gradient Editor
+                    </button>
+                </div>
+            )}
+            
+            {!value.isStatic && !inGradientUI && (
+                <div>
+                    
+                    {/* Display Gradient */}
                     <div>
-                        <label>Dynamic Range</label>
-                        {/* gradient ui */}
+                        <DisplayBar 
+                            width={200}
+                            height={20} 
+                            hsvValues={value.Dynamic.map(colorStop => colorStop.color)}
+                            positions={value.Dynamic.map(colorStop => colorStop.position / 100)}
+                            style={0}
+                            numPanels={7}
+                        />
                     </div>
+                    
 
                     {/* handle Shift Type */}
                     <div>
@@ -85,6 +106,17 @@ function DynamicColorRangeComponent( {value, onChange } ) {
                     </div>
                     )}
                     
+                </div>
+            )}
+
+            {!value.isStatic && inGradientUI && (
+                <div>
+                    {/* gradient ui */}
+                    <GradientUI 
+                        width={400}
+                        defaultGradient={value.Dynamic}
+                        onUpdate={(gradient) => {handleUpdate("Dynamic", gradient)}}
+                    />
                 </div>
             )}
 

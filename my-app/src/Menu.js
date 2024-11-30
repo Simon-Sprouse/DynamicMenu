@@ -13,13 +13,23 @@ function Menu() {
             "ForegroundColor" : {
                 "isStatic": true,
                 "Static": {"h":120, "s":90, "v":80},
-                "Gradient": [
+                "Dynamic": [
                     { "color" : {"h":120, "s":90, "v":80}, "position": 0 },
                     { "color" : {"h":180, "s":90, "v":80}, "position": 100 },
                 ],
                 "ShiftType": "loop",
                 "ShiftSpeed": 69,
-            }
+            },
+            "BackgroundColor" : {
+                "isStatic": true,
+                "Static": {"h":0, "s":0, "v":0},
+                "Dynamic": [
+                    { "color" : {"h":120, "s":90, "v":80}, "position": 0 },
+                    { "color" : {"h":180, "s":90, "v":80}, "position": 100 },
+                ],
+                "ShiftType": "loop",
+                "ShiftSpeed": 69,
+            },
         },
         "Shape": {
             "ElementSize": {
@@ -50,16 +60,18 @@ function Menu() {
     const schema = {
         
         "Color": { 
-
-            "conditional": () => ["Color"].includes(menuWindow),
-
+            "conditional": () => menuWindow == "Color",
             "ForegroundColor": {
                 "component": "dynamicColorRange",
                 "props": {},
-            }
-            
+            },
+            "BackgroundColor": {
+                "component": "dynamicColorRange",
+                "props": {},
+            },
         },
         "Shape": {
+            "conditional": () => menuWindow == "Shape",
             "ElementSize": { 
                 "component": "dynamicRange", 
                 "props": { "min": 0, "max": 200 },
@@ -68,9 +80,9 @@ function Menu() {
                 "component": "dynamicRange", 
                 "props": { "min": 0, "max": 20} 
             },
-            "conditional": () => menuWindow == "Shape"
         },
         "Movement": {
+            "conditional": () => menuWindow == "Movement",
             "Pattern" : { 
                 "component": "select", 
                 "props": { "options": ["random", "randomWalk"]} 
@@ -84,7 +96,6 @@ function Menu() {
                 "props": { "min": 0, "max": 100},
                 "conditional": () => parameters.Movement.Pattern == "randomWalk"
             },
-            "conditional": () => menuWindow == "Movement"
         }
     };
 

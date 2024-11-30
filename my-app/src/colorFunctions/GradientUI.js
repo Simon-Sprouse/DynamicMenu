@@ -115,6 +115,7 @@ function GradientUI({ width, defaultGradient, onUpdate }) {
     return (
         <div className="App">
         <header className="App-header">
+            <button onClick={updateForParentComponent}>Apply Gradient</button>
             <span>
                 <button onClick={randomizeColors}>Randomize Colors</button>
                 <button onClick={() => setStyle(prevStyle => prevStyle == 1 ? 0 : 1)}>{style == 1 ? "Gradient" : "Step"}</button>
@@ -138,7 +139,7 @@ function GradientUI({ width, defaultGradient, onUpdate }) {
                     updateHsv={newHsv => updateHsvValue(index, newHsv)}/>
             ))}
             
-            <button onClick={updateForParentComponent}>Apply Gradient</button>
+            
 
             {/* <pre style={{textAlign: "left"}}>
                 {"background: linear-gradient(90deg,\n"}
