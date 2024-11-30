@@ -1,5 +1,7 @@
-function DynamicRangeComponent({ value, onChange, min, max }) { 
-    
+import ColorWheel from "../colorFunctions/ColorWheel";
+
+function DynamicColorRangeComponent( {value, onChange } ) { 
+
     function handleUpdate(key, newValue) { 
         const updatedState = { ...value, [key]: newValue };
         onChange(updatedState);
@@ -26,36 +28,23 @@ function DynamicRangeComponent({ value, onChange, min, max }) {
             {value.isStatic && (
                 <div>
                     {/* handle Static value */}
-                    <label>Static Value</label>
-                    <input 
-                        type="range"
-                        min={min}
-                        max={max}
-                        defaultValue={value.Static}
-                        onChange={(event) => handleUpdate("Static", parseInt(event.target.value))}
+                    <ColorWheel 
+                        width={400}
+                        hsv={value.Static}
+                        counter={0}
+                        updateHsv={(hsv) => handleUpdate("Static", hsv)}
+
                     />
                 </div>
             )}
 
+            
             {!value.isStatic && (
                 <div>
-                    {/* handle Dynamic Range */}
+                    handle Dynamic Range
                     <div>
                         <label>Dynamic Range</label>
-                        <input 
-                            type="range"
-                            min={min}
-                            max={max}
-                            defaultValue={value.Dynamic[0]}
-                            onChange={(event) => handleUpdate("Dynamic", [parseInt(event.target.value), value.Dynamic[1]])}
-                        />
-                        <input 
-                            type="range"
-                            min={min}
-                            max={max}
-                            defaultValue={value.Dynamic[1]}
-                            onChange={(event) => handleUpdate("Dynamic", [value.Dynamic[0], parseInt(event.target.value)])}
-                        />
+                        {/* gradient ui */}
                     </div>
 
                     {/* handle Shift Type */}
@@ -98,9 +87,10 @@ function DynamicRangeComponent({ value, onChange, min, max }) {
                     
                 </div>
             )}
+
             
         </div>
     )
 }
 
-export default DynamicRangeComponent;
+export default DynamicColorRangeComponent;

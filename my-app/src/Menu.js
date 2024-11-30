@@ -10,14 +10,16 @@ function Menu() {
 
     const [parameters, setParameters] = useState({
         "Color": { 
-            "isStatic": true,
-            "Static": {"h":120, "s":90, "v":80},
-            "Gradient": [
-                { "color" : {"h":120, "s":90, "v":80}, "position": 0 },
-                { "color" : {"h":180, "s":90, "v":80}, "position": 100 },
-            ],
-            "Shift": "loop",
-            "ShiftSpeed": 69,
+            "ForegroundColor" : {
+                "isStatic": true,
+                "Static": {"h":120, "s":90, "v":80},
+                "Gradient": [
+                    { "color" : {"h":120, "s":90, "v":80}, "position": 0 },
+                    { "color" : {"h":180, "s":90, "v":80}, "position": 100 },
+                ],
+                "ShiftType": "loop",
+                "ShiftSpeed": 69,
+            }
         },
         "Shape": {
             "ElementSize": {
@@ -48,38 +50,13 @@ function Menu() {
     const schema = {
         
         "Color": { 
-            
+
             "conditional": () => ["Color"].includes(menuWindow),
 
-            "isStatic": {
-                "component": "button",
-                "props": { "label": "isStatic"},
-            },
-            "Static": {
-                "component": "colorWheel",
-                "props": { "label": "Slish"},
-                "conditional": () => parameters.Color.isStatic == true,
-            },
-            "Edit Gradient": {
-                "component": "menuButton",
-                "props": { "label": "Edit Gradient", "result": "Gradient"},
-                "conditional": () => parameters.Color.isStatic == false,
-            },
-            "Gradient": { 
-                "component": "gradientUI", 
-                "props": { "label": "Slish"}, 
-                "conditional": () => parameters.Color.isStatic == false,
-            },
-            "Shift": { 
-                "component": "select", 
-                "props": { "options": ["loop", "bounce", "meander", "random"]},
-                "conditional": () => parameters.Color.isStatic == false,
-            },
-            "ShiftSpeed": { 
-                "component": "slider", 
-                "props": { "min": 2, "max": 200},
-                "conditional": () => parameters.Color.isStatic == false && ["loop", "bounce", "meander"].includes(parameters.Color.Shift),
-            },
+            "ForegroundColor": {
+                "component": "dynamicColorRange",
+                "props": {},
+            }
             
         },
         "Shape": {

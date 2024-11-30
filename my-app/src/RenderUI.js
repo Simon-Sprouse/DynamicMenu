@@ -6,6 +6,7 @@ import SelectComponent from './components/SelectComponent';
 import MenuButtonComponent from './components/MenuButtonComponent.js';
 
 import DynamicRangeComponent from './components/DynamicRangeComponent.js';
+import DynamicColorRangeComponent from './components/DynamicColorRangeComponent.js';
 
 function RenderUI({ parameters, schema, path, onChange, updateMenu }) { 
 
@@ -20,6 +21,7 @@ function RenderUI({ parameters, schema, path, onChange, updateMenu }) {
         "button": ButtonComponent,
         "select": SelectComponent,
         "dynamicRange": DynamicRangeComponent, 
+        "dynamicColorRange": DynamicColorRangeComponent,
     }
 
     const DefaultComponent = ({ name }) => <div>Unknown Component: {name}</div>;
