@@ -1,8 +1,8 @@
 import { useRef, useEffect, useState } from 'react';
 
-import { hsvObjectToRgbString } from './colorFunctions';
+import { hsvObjectToRgbString, rgbToHsv } from './colorFunctions';
 
-function DisplayBar({width, height, hsvValues, positions, style, numPanels}) { 
+function DisplayBar({ width, height, hsvValues, positions, style, numPanels, setDiscreteGradient }) { 
 
     // const width = 800;
 
@@ -42,6 +42,7 @@ function DisplayBar({width, height, hsvValues, positions, style, numPanels}) {
 
         // console.log("Discrete Bar");
 
+        const discreteArray = []
         if (style == 1) {
             if (hsvValues.length >= 2 && hsvValues.length == positions.length) { 
 
@@ -59,13 +60,20 @@ function DisplayBar({width, height, hsvValues, positions, style, numPanels}) {
                     const highDistance = Math.round(((i+1) / numPanels) * 100) / 100;
 
                     const medDistance = (lowDistance + highDistance) / 2;
-                    const pixelColor = getPixelColor(medDistance);
+                    const [r, g, b] = getPixelColor(medDistance);
+                    const pixelColor = `rgb(${r}, ${g}, ${b})`;
 
 
                     discreteGradient.addColorStop(lowDistance, pixelColor);
                     discreteGradient.addColorStop(highDistance, pixelColor);
+
+                    discreteArray.push({"color": rgbToHsv(r, g, b), "position": lowDistance * 100});
+                    discreteArray.push({"color": rgbToHsv(r, g, b), "position": highDistance * 100});
                 
                 }
+
+                
+                setDiscreteGradient(discreteArray);
 
                 ctx.fillStyle = discreteGradient;
                 ctx.fillRect(0, 0, canvas.width, canvas.height);
@@ -100,7 +108,7 @@ function DisplayBar({width, height, hsvValues, positions, style, numPanels}) {
 
         const pixelData = ctx.getImageData(xPos, 0, 1, 1).data; // r, g, b, a
         const [r, g, b, a] = pixelData;
-        return `rgb(${r}, ${g}, ${b})`
+        return [r, g, b];
     }
 
 

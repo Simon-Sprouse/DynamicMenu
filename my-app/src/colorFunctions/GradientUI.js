@@ -1,5 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 
+import { getColorFromGradient } from './colorFunctions';
+
 import ColorWheel from './ColorWheel';
 import GradientBar from './GradientBar';
 import DisplayBar from './DisplayBar';
@@ -25,6 +27,7 @@ function GradientUI({ width, defaultGradient, onUpdate }) {
 
     const [style, setStyle] = useState(0);          // 0: gradient or 1: step
     const [numPanels, setNumPanels] = useState(5);
+    const [discreteGradient, setDiscreteGradient] = useState({}); // passed to display bar to gather discrete gradient
 
    
 
@@ -101,15 +104,26 @@ function GradientUI({ width, defaultGradient, onUpdate }) {
 
     // when apply button is pressed
     function updateForParentComponent() { 
-        const gradient = []
-        positions.forEach((pos, index) => {
-            const stop = {
-                color: hsvValues[index],
-                position:  Math.round(pos*100)
-            }
-            gradient.push(stop);
-        })
-        onUpdate(gradient);
+
+        
+        if (style == 0) { 
+            // gradient
+            const gradient = [];
+            positions.forEach((pos, index) => {
+                const stop = {
+                    color: hsvValues[index],
+                    position:  Math.round(pos*100)
+                }
+                gradient.push(stop);
+            })
+            onUpdate(gradient);
+        }
+        else if (style == 1) { 
+            // step 
+
+            onUpdate(discreteGradient);
+        }
+        
     }
     
     return (
@@ -127,7 +141,15 @@ function GradientUI({ width, defaultGradient, onUpdate }) {
                 <button onClick={addColorWheel}>Add Color</button>
                 <button onClick={removeColorWheel}>Remove Color</button>
             </span>
-            <DisplayBar width={width} height={width / 4} hsvValues={hsvValues} positions={positions} style={style} numPanels={numPanels}/>
+            <DisplayBar 
+                width={width} 
+                height={width / 4} 
+                hsvValues={hsvValues} 
+                positions={positions} 
+                style={style} 
+                numPanels={numPanels}
+                setDiscreteGradient={setDiscreteGradient}
+            />
             <p></p>
             <GradientBar width={width} hsvValues={hsvValues} positions={positions} setPositions={setPositions}/>
             {hsvValues.map((hsv, index) => (

@@ -20,7 +20,7 @@ function Menu() {
                 "ShiftType": "loop",
                 "ShiftSpeed": 69,
             },
-            "BackgroundColor" : {
+            "BorderColor" : {
                 "isStatic": true,
                 "Static": {"h":0, "s":0, "v":0},
                 "Dynamic": [
@@ -32,6 +32,14 @@ function Menu() {
             },
         },
         "Shape": {
+            "ElementShape": "circle",
+            "ElementTilt": {
+                "isStatic": true,
+                "Static": 40,
+                "Dynamic": [0, 90],
+                "ShiftType": "loop",
+                "ShiftSpeed": 42,
+            },
             "ElementSize": {
                 "isStatic": true,
                 "Static": 100,
@@ -65,13 +73,22 @@ function Menu() {
                 "component": "dynamicColorRange",
                 "props": {},
             },
-            "BackgroundColor": {
+            "BorderColor": {
                 "component": "dynamicColorRange",
                 "props": {},
             },
         },
         "Shape": {
             "conditional": () => menuWindow == "Shape",
+            "ElementShape": {
+                "component": "select",
+                "props": { "options": ["circle", "square", "triangle"] },
+            },
+            "ElementTilt": {
+                "component": "dynamicRange",
+                "props": { "min": 0, "max": 359 },
+                "conditional": () => ["square", "triangle"].includes(parameters.Shape.ElementShape)
+            },
             "ElementSize": { 
                 "component": "dynamicRange", 
                 "props": { "min": 0, "max": 200 },
@@ -85,7 +102,7 @@ function Menu() {
             "conditional": () => menuWindow == "Movement",
             "Pattern" : { 
                 "component": "select", 
-                "props": { "options": ["random", "randomWalk"]} 
+                "props": { "options": ["random", "randomWalk"] } 
             },
             "Speed": { 
                 "component": "slider", 
@@ -125,7 +142,35 @@ function Menu() {
     }
 
     const visibleSchema = handleDynamicSchema(schema, parameters);
-    // console.log("visible Schema: ", visibleSchema);
+
+    // TODO complete this function
+    // takes schema after conditionals are removed, keeps what parameters are left
+    function getVisibleParameters(visibleSchema, parameters) { 
+
+        const result = {};
+
+        for (const key in parameters) { 
+
+            if (visibleSchema[key]) {
+                if (typeof(parameters[key]) == "object") { 
+                    result[key] = getVisibleParameters(visibleSchema[key], parameters[key]);
+                }
+                else { 
+                    result[key] = parameters[key];
+                }    
+            }
+            else if (visibleSchema["component"]) { 
+                result[key] = parameters[key];
+            }
+            
+        }
+
+
+
+       return result;
+    }
+  
+    const visibleParameters = getVisibleParameters(visibleSchema, parameters);
 
 
     function setNestedValue(obj, path, value) { 
@@ -188,7 +233,7 @@ function Menu() {
             <p>Menu Window: {menuWindow}</p>
             <span style={{display: "flex", justifyContent: "space-between"}}>
                 <div style={{flex: 1, paddingRight: '20px'}}>
-                    <pre style={{"textAlign": "left"}}>Parameters: {JSON.stringify(parameters, null, 2)}</pre>
+                    <pre style={{"textAlign": "left"}}>Parameters: {JSON.stringify(visibleParameters, null, 2)}</pre>
                 </div>
                 <div style={{flex: 1}}>
                     <RenderUI 
