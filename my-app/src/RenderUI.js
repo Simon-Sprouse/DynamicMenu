@@ -3,7 +3,7 @@ import { useState } from 'react';
 import SliderComponent from './components/SliderComponent';
 import ButtonComponent from './components/ButtonComponent';
 import SelectComponent from './components/SelectComponent';
-import MenuButtonComponent from './components/MenuButtonComponent.js';
+
 
 import DynamicRangeComponent from './components/DynamicRangeComponent.js';
 import DynamicColorRangeComponent from './components/DynamicColorRangeComponent.js';

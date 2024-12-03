@@ -50,8 +50,7 @@
             "Pattern": "randomWalk",
             "Speed": 42,
             "StepSize": 69
-        },
-        "Test": {}
+        }
     },
     "schema": {
         
@@ -101,9 +100,6 @@
                 "props": { "min": 0, "max": 100},
                 "conditional": "parameters.Movement.Pattern == 'randomWalk'"
             }
-        },
-        "Test": {
-            "conditional": "menuWindow == 'Test'"
         }
     }
 }

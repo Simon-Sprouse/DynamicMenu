@@ -48,7 +48,7 @@ function Menu({ menuWindow, parameters, setParameters, schema }) {
 
     const visibleSchema = handleDynamicSchema(schema, menuWindow, parameters);
 
-    // TODO complete this function
+
     // takes schema after conditionals are removed, keeps what parameters are left
     function getVisibleParameters(visibleSchema, parameters) { 
 
@@ -66,6 +66,7 @@ function Menu({ menuWindow, parameters, setParameters, schema }) {
             }
             else if (visibleSchema["component"]) { 
                 result[key] = parameters[key];
+                console.log("result[key]: ", result[key]);
                 
             }
             

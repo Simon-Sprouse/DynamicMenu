@@ -9,16 +9,7 @@ function MainMenu() {
 
     const [parameters, setParameters] = useState(config.defaultParameters);
     const [menuWindow, setMenuWindow] = useState("Canvas");
-
- 
-
-   
-
     const schema = config.schema;
-
-
-
-
     const canvasRef = useRef(null);
     
 
@@ -79,6 +70,7 @@ function MainMenu() {
 
     }
 
+
     useEffect(() => { 
         function handleKeyDown(event) { 
             if (event.key == "Escape") { 
@@ -93,7 +85,6 @@ function MainMenu() {
 
     // handle menu blur
     useEffect(() => { 
-       
         if (menuWindow != "Canvas") { 
             document.getElementById("blurTarget").classList.add("blur");
         }
