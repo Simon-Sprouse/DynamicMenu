@@ -4,119 +4,21 @@ import { useState, useEffect } from 'react';
 
 import RenderUI from './RenderUI';
 
-function Menu() { 
+function Menu({ menuWindow, parameters, setParameters, schema }) { 
 
-    const [menuWindow, setMenuWindow] = useState("Color");
 
-    const [parameters, setParameters] = useState({
-        "Color": { 
-            "ForegroundColor" : {
-                "isStatic": true,
-                "Static": {"h":120, "s":90, "v":80},
-                "Dynamic": [
-                    { "color" : {"h":120, "s":90, "v":80}, "position": 0 },
-                    { "color" : {"h":180, "s":90, "v":80}, "position": 100 },
-                ],
-                "ShiftType": "loop",
-                "ShiftSpeed": 69,
-            },
-            "BorderColor" : {
-                "isStatic": true,
-                "Static": {"h":0, "s":0, "v":0},
-                "Dynamic": [
-                    { "color" : {"h":120, "s":90, "v":80}, "position": 0 },
-                    { "color" : {"h":180, "s":90, "v":80}, "position": 100 },
-                ],
-                "ShiftType": "loop",
-                "ShiftSpeed": 69,
-            },
-        },
-        "Shape": {
-            "ElementShape": "circle",
-            "ElementTilt": {
-                "isStatic": true,
-                "Static": 40,
-                "Dynamic": [0, 90],
-                "ShiftType": "loop",
-                "ShiftSpeed": 42,
-            },
-            "ElementSize": {
-                "isStatic": true,
-                "Static": 100,
-                "Dynamic": [0, 100],
-                "ShiftType": "loop",
-                "ShiftSpeed": 42,
-            },
-            "BorderSize": {
-                "isStatic": true,
-                "Static": 10,
-                "Dynamic": [0, 10],
-                "ShiftType": "loop",
-                "ShiftSpeed": 42,
-            },
-        }, 
-        "Movement": {
-            "Pattern": "randomWalk",
-            "Speed": 42,
-            "StepSize": 69,
+    function stringToFunction(stringConditional) { 
+        try { 
+            const func = new Function("menuWindow", "parameters", `return ${stringConditional}`);
+            return (menuWindow, parameters) => func(menuWindow, parameters);
         }
-    });
-
-
- 
-
-    const schema = {
-        
-        "Color": { 
-            "conditional": () => menuWindow == "Color",
-            "ForegroundColor": {
-                "component": "dynamicColorRange",
-                "props": {},
-            },
-            "BorderColor": {
-                "component": "dynamicColorRange",
-                "props": {},
-            },
-        },
-        "Shape": {
-            "conditional": () => menuWindow == "Shape",
-            "ElementShape": {
-                "component": "select",
-                "props": { "options": ["circle", "square", "triangle"] },
-            },
-            "ElementTilt": {
-                "component": "dynamicRange",
-                "props": { "min": 0, "max": 359 },
-                "conditional": () => ["square", "triangle"].includes(parameters.Shape.ElementShape)
-            },
-            "ElementSize": { 
-                "component": "dynamicRange", 
-                "props": { "min": 0, "max": 200 },
-            },
-            "BorderSize":  { 
-                "component": "dynamicRange", 
-                "props": { "min": 0, "max": 20} 
-            },
-        },
-        "Movement": {
-            "conditional": () => menuWindow == "Movement",
-            "Pattern" : { 
-                "component": "select", 
-                "props": { "options": ["random", "randomWalk"] } 
-            },
-            "Speed": { 
-                "component": "slider", 
-                "props": { "min": 0, "max": 100}
-            },
-            "StepSize": { 
-                "component": "slider", 
-                "props": { "min": 0, "max": 100},
-                "conditional": () => parameters.Movement.Pattern == "randomWalk"
-            },
+        catch { 
+            return () => {}
         }
-    };
+    }
+   
 
-    function handleDynamicSchema(schema, parameters) {
+    function handleDynamicSchema(schema, menuWindow, parameters) {
         const result = {};
 
         // search every child to see if child has conditional
@@ -124,11 +26,14 @@ function Menu() {
             const section = schema[key];
             // if conditional is present
             if (section.conditional) {
+                const conditionalFunction = stringToFunction(section.conditional);
                 // add section without conditional if true
-                if (section.conditional()) { 
+                if (conditionalFunction(menuWindow, parameters)) { 
+
                     const { conditional, ...sectionWithoutConditional } = section;
-                    result[key] = handleDynamicSchema(sectionWithoutConditional, parameters);
+                    result[key] = handleDynamicSchema(sectionWithoutConditional, menuWindow, parameters);
                 }
+
             }
             else if (typeof section == "object" && !Array.isArray(section)) { 
                 result[key] = handleDynamicSchema(section, parameters);
@@ -141,7 +46,7 @@ function Menu() {
         return result;
     }
 
-    const visibleSchema = handleDynamicSchema(schema, parameters);
+    const visibleSchema = handleDynamicSchema(schema, menuWindow, parameters);
 
     // TODO complete this function
     // takes schema after conditionals are removed, keeps what parameters are left
@@ -161,6 +66,7 @@ function Menu() {
             }
             else if (visibleSchema["component"]) { 
                 result[key] = parameters[key];
+                
             }
             
         }
@@ -198,34 +104,7 @@ function Menu() {
     }
 
 
-    function handleEscape() { 
-        if (menuWindow == "Color") { 
-            setMenuWindow("Shape");
-        }
-        else if (menuWindow == "Shape") { 
-            setMenuWindow("Movement");
-        }
-        else if (menuWindow == "Movement") { 
-            setMenuWindow("Color");
-        }
-        else { 
-            setMenuWindow("Color");
-        }
-
-    }
-
-
-    useEffect(() => { 
-        function handleKeyDown(event) { 
-            if (event.key == "Escape") { 
-                handleEscape();
-            }
-        }
-        document.addEventListener("keydown", handleKeyDown);
-        return () => { 
-            document.removeEventListener("keydown", handleKeyDown);
-        }
-    });
+   
 
 
     return (
@@ -241,7 +120,7 @@ function Menu() {
                         schema={visibleSchema}
                         path={[]}
                         onChange={handleParameterChange}
-                        updateMenu={(menuOption) => setMenuWindow(menuOption)}
+
                     />
                 </div>
                 

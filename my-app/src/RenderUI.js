@@ -8,7 +8,7 @@ import MenuButtonComponent from './components/MenuButtonComponent.js';
 import DynamicRangeComponent from './components/DynamicRangeComponent.js';
 import DynamicColorRangeComponent from './components/DynamicColorRangeComponent.js';
 
-function RenderUI({ parameters, schema, path, onChange, updateMenu }) { 
+function RenderUI({ parameters, schema, path, onChange }) { 
 
     // const getNestedValue = (obj, path) => path.reduce((o, key) => (o ? o[key] : undefined), obj);
 
@@ -50,17 +50,6 @@ function RenderUI({ parameters, schema, path, onChange, updateMenu }) {
                         schema={value}
                         path={currentPath}
                         onChange={onChange}
-                        updateMenu={updateMenu}
-                    />
-                </div>
-            )
-        }
-        else if (typeof value == "object" && value.component == "menuButton") { 
-            return (
-                <div key={value}>
-                    <MenuButtonComponent 
-                        onChange={updateMenu}
-                        {...(value.props || {})}
                     />
                 </div>
             )
